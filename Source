@@ -1,0 +1,195 @@
+import os
+import shutil
+import requests
+from colorama import Fore
+from pypresence import Presence
+
+margin = "  "  # 2 + Space
+width = shutil.get_terminal_size().columns
+lqr = int(width / 4) + 7
+tabs = ""
+for i in range(0, lqr):
+    tabs += " "
+rawDivider = "   "
+for i in range(10, width - 6):
+    rawDivider += "═"
+
+logo = fr"""{Fore.CYAN}
+{tabs}         ___ _               _
+{tabs} __  __ / __\ |__   ___  ___| | _____ _ __
+{tabs} \ \/ // /  | '_ \ / _ \/ __| |/ / _ \ '__|
+{tabs}  >  </ /___| | | |  __/ (__|   <  __/ |
+{tabs} /_/\_\____/|_| |_|\___|\___|_|\_\___|_|{Fore.RESET}
+"""
+options = fr"""
+{tabs}{Fore.CYAN} ╔════════════════════════════════════════╗{Fore.RESET}
+{tabs}{Fore.CYAN} ║ [{Fore.RESET}1{Fore.CYAN}]{Fore.RESET} Filter .../names.txt using Input   {Fore.CYAN}║{Fore.RESET}               
+{tabs}{Fore.CYAN} ║ [{Fore.RESET}2{Fore.CYAN}]{Fore.RESET} Check All Names in .../names.txt   {Fore.CYAN}║{Fore.RESET}
+{tabs}{Fore.CYAN} ║ [{Fore.RESET}3{Fore.CYAN}]{Fore.RESET} Quit                               {Fore.CYAN}║{Fore.RESET}
+{tabs}{Fore.CYAN} ╚════════════════════════════════════════╝{Fore.RESET}
+{tabs}
+"""
+menu = logo + options
+divider = f"{Fore.CYAN}{rawDivider}{Fore.RESET}"
+
+app_ID = "825680500655259659"  # Application ID
+main_text = "xChecker"
+large_image = "King"
+large_text = "Xbox Services!"
+buttons = [
+    {"label": "Website", "url": "https://solarsb.xyz"}
+]
+
+BASE_API_URL = "https://www.gamertagavailability.com/check.php"
+
+headers = {
+    "Authority": "www.gamertagavailability.com",
+    "Accept-Language": "en-GB,en;q=0.9",
+    "Cache-Control": "no-cache",
+    "Origin": "https://www.gamertagavailability.com",
+    "referer": "https://www.gamertagavailability.com/",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+}
+
+
+def customCheck():
+    try:
+        RPC.update(state=main_text, details="Custom Checking", large_image=large_image, large_text=large_text,
+                   buttons=buttons)
+    except:
+        pass
+    os.system("cls")
+    os.system("title xChecker v1.0 ｜ Custom Checking ｜ Developed by Syntaxツ#1337 & loki#3701")
+    print(logo)
+    print(divider)
+    if not os.path.exists("names.txt"):
+        print(
+            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} Unable to Locate .../names.txt in the File Directory")
+        input(
+            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.CYAN}PRESS{Fore.RESET} any {Fore.CYAN}KEY{Fore.RESET} to {Fore.CYAN}RETURN{Fore.RESET} to the {Fore.CYAN}MAIN MENU{Fore.RESET}")
+        mainMenu()
+
+    filter = input(f"{margin} {Fore.CYAN}[{Fore.RESET}?{Fore.CYAN}]{Fore.RESET} Enter Custom Filter: ")
+    print()
+    with open("names.txt", "r", encoding="UTF-8") as File:
+        lines = File.readlines()
+        clean = [l.strip() for l in lines if l.strip()]
+        for name in clean:
+            if name:
+                if filter in str(name):
+                    check = checker.post(BASE_API_URL, data={"Gamertag": name, "Language": "English"})
+                    if check.status_code != 200:
+                        print(
+                            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} Failed to Connect to the Checker")
+                        break
+                    else:
+                        if "Gamertag Taken" in check.text:
+                            print(
+                                f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.MAGENTA}{name}{Fore.RESET} is {Fore.RED}NOT AVAILABLE{Fore.RESET}")
+
+                        elif "Gamertag Available" in check.text:
+                            print(
+                                f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.MAGENTA}{name}{Fore.RESET} is {Fore.GREEN}AVAILABLE{Fore.RESET}")
+
+                        else:
+                            print(
+                                f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.MAGENTA}{name}{Fore.RESET} is {Fore.YELLOW}UNKNOWN{Fore.RESET}")
+
+    print()
+    input(
+        f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.CYAN}PRESS{Fore.RESET} any {Fore.CYAN}KEY{Fore.RESET} to {Fore.CYAN}RETURN{Fore.RESET} to the {Fore.CYAN}MAIN MENU{Fore.RESET}")
+    mainMenu()
+
+
+def checkAll():
+    try:
+        RPC.update(state=main_text, details="Checking All", large_image=large_image, large_text=large_text,
+                   buttons=buttons)
+    except:
+        pass
+    os.system("cls")
+    os.system("title xChecker v1.0 ｜ Checking All ｜ Developed by Syntaxツ#1337")
+    print(logo)
+    print(divider)
+    if not os.path.exists("names.txt"):
+        print(
+            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} Unable to Locate .../names.txt in the File Directory")
+        input(
+            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.CYAN}PRESS{Fore.RESET} any {Fore.CYAN}KEY{Fore.RESET} to {Fore.CYAN}RETURN{Fore.RESET} to the {Fore.CYAN}MAIN MENU{Fore.RESET}")
+        mainMenu()
+
+    with open("names.txt", "r", encoding="UTF-8") as File:
+        lines = File.readlines()
+        clean = [l.strip() for l in lines if l.strip()]
+        for name in clean:
+            if name:
+                check = checker.post(BASE_API_URL, data={"Gamertag": name, "Language": "English"})
+                if check.status_code != 200:
+                    print(
+                        f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} Failed to Connect to the Checker")
+                    break
+                else:
+                    if "Gamertag Taken" in check.text:
+                        print(
+                            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.MAGENTA}{name}{Fore.RESET} is {Fore.RED}NOT AVAILABLE{Fore.RESET}")
+
+                    elif "Gamertag Available" in check.text:
+                        print(
+                            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.MAGENTA}{name}{Fore.RESET} is {Fore.GREEN}AVAILABLE{Fore.RESET}")
+
+                    else:
+                        print(
+                            f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.MAGENTA}{name}{Fore.RESET} is {Fore.YELLOW}UNKNOWN{Fore.RESET}")
+
+    print()
+    input(
+        f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} {Fore.CYAN}PRESS{Fore.RESET} any {Fore.CYAN}KEY{Fore.RESET} to {Fore.CYAN}RETURN{Fore.RESET} to the {Fore.CYAN}MAIN MENU{Fore.RESET}")
+    mainMenu()
+
+    
+
+
+def mainMenu():
+    try:
+        RPC.update(state=main_text, details="Main Menu", large_image=large_image, large_text=large_text,
+                   buttons=buttons)
+    except:
+        pass
+    os.system("cls")
+    os.system("title xChecker v1.0 ｜ Main Menu ｜ Developed by Syntaxツ#1337")
+    print(menu)
+    options = ["1", "2", "3"]
+    choice = input(f"{margin} {Fore.CYAN}[{Fore.RESET}?{Fore.CYAN}]{Fore.RESET} Enter Option: ")
+    while choice not in options:
+        print()
+        print(f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} Invalid Option")
+        print(f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} Try Again...")
+        print()
+        choice = input(f"{margin} {Fore.CYAN}[{Fore.RESET}?{Fore.CYAN}]{Fore.RESET} Enter Option: ")
+
+    if choice == "1":
+        customCheck()
+    elif choice == "2":
+        checkAll()
+    elif choice == "3":
+        os._exit(0)
+
+
+if __name__ == "__main__":
+    try:
+        checker = requests.Session()
+        checker.headers.update(headers)
+    except:
+        os.system("cls")
+        os.system("title xChecker v1.0 ｜Failed to Connect ｜ Developed by Syntaxツ#1337")
+        print(logo)
+        print(divider)
+        print(f"{margin} {Fore.CYAN}[{Fore.RESET}!{Fore.CYAN}]{Fore.RESET} Failed to Connect to the Checker")
+        input(f"{margin}     PRESS any KEY to EXIT")
+        os._exit(0)
+    try:
+        RPC = Presence(app_ID)
+        RPC.connect()
+    except:
+        pass
+    mainMenu()
